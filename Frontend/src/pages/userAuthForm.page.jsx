@@ -1,14 +1,97 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useContext } from "react";
+import { Link, Navigate } from "react-router-dom";
 import InputBox from "../components/input.component";
 import googleIcon from "../imgs/google.png";
 import AnimationWrapper from "../common/page-animation";
+import { Toaster, toast } from "react-hot-toast";
+import axios from "axios";
+import { storeInSession } from "../common/session";
+import { UserContext } from "../App";
 
 export default function UserAuthForm({ type }) {
+  let {
+    userAuth,
+    setUserAuth,
+  } = useContext(UserContext);
+
+
+  console.log(userAuth);
+
+  // Ensure userAuth object is defined before accessing its properties
+  const access_token = userAuth ? userAuth.access_token : null;
+  console.log(access_token);
+
+  const userAuthToServer = (serverRoute, formData) => {
+    axios
+      .post(import.meta.env.VITE_SERVER_DOMAIN + serverRoute, formData)
+      .then(({ data }) => {
+        storeInSession("user", JSON.stringify(data));
+        setUserAuth(data);
+      })
+      .catch((error) => {
+        console.error(error); // Log the entire error object for debugging
+        if (error.response && error.response.data) {
+          toast.error(error.response.data); // Display the entire response data in the toast
+        } else {
+          toast.error("An error occurred. Please try again later."); // Generic error message
+        }
+      });
+    // .catch(({ response }) => {
+    //   toast.error(response.data.error);
+    // });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    let serverRoute =
+      type == "sign-in" ? "/api/users/signin" : "/api/users/signup";
+
+    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
+    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
+
+    // FormData
+    let form = new FormData(formElement);
+    let formData = {};
+
+    for (let [key, value] of form.entries()) {
+      formData[key] = value;
+    }
+    console.log("form data", formData);
+
+    let { fullname, email, password } = formData;
+
+    // Form Validitation
+
+    if (fullname) {
+      if (fullname.length < 3) {
+        return toast.error("Fullname must be at least 3 letters long");
+      }
+    }
+    if (!email.length) {
+      return toast.error("Email is required");
+    }
+    if (!emailRegex.test(email)) {
+      return toast.error("Invalid Email Format");
+    }
+    if (!passwordRegex.test(password)) {
+      return toast.error(
+        `Password should contain the following : \n1. One uppercase letter \n2. One lowercase letter \n3. One number \n4. Should be between 6 to 20 characters`
+      );
+    }
+    userAuthToServer(serverRoute, formData);
+  };
+
   return (
+    access_token ? <Navigate  to= "/" /> :
     <AnimationWrapper keyValue={type}>
       <section className="h-cover flex items-center justify-center">
-        <form className="w-[80%] max-w-[400px]">
+        <Toaster />
+        <form
+          className="w-[80%] max-w-[400px]"
+          id="formElement"
+          onSubmit={handleSubmit}
+        >
           <h1 className="text-4xl font-gelasio capitalize text-center mb-24">
             {type == "sign-in" ? "Welcome Back" : "Join Us Today"}
           </h1>
@@ -38,7 +121,11 @@ export default function UserAuthForm({ type }) {
             icon="fi-rr-key"
           />
 
-          <button className="btn-dark center mt-14" type="submit">
+          <button
+            className="btn-dark center mt-14"
+            type="submit"
+            onClick={handleSubmit}
+          >
             {type.replace("-", " ")}
           </button>
 
