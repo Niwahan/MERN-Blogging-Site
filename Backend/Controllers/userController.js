@@ -6,7 +6,7 @@ import {
 } from "../Services/UserServices.js";
 import User from "../Schema/User.js";
 import admin from "firebase-admin";
-import serviceAccount from "../mern-blogging-site-6ed02-firebase-adminsdk-huap8-30f78e2f89.json" assert { type: "json" };
+import serviceAccount from "../firebaseConfig.json" assert { type: "json" };
 import { getAuth } from "firebase-admin/auth";
 
 admin.initializeApp({
