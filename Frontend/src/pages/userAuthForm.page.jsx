@@ -7,19 +7,13 @@ import { Toaster, toast } from "react-hot-toast";
 import axios from "axios";
 import { storeInSession } from "../common/session";
 import { UserContext } from "../App";
+import { authWithGoogle } from "../common/firebase";
 
 export default function UserAuthForm({ type }) {
-  let {
-    userAuth,
-    setUserAuth,
-  } = useContext(UserContext);
-
-
-  console.log(userAuth);
+  let { userAuth, setUserAuth } = useContext(UserContext);
 
   // Ensure userAuth object is defined before accessing its properties
   const access_token = userAuth ? userAuth.access_token : null;
-  console.log(access_token);
 
   const userAuthToServer = (serverRoute, formData) => {
     axios
@@ -28,17 +22,9 @@ export default function UserAuthForm({ type }) {
         storeInSession("user", JSON.stringify(data));
         setUserAuth(data);
       })
-      .catch((error) => {
-        console.error(error); // Log the entire error object for debugging
-        if (error.response && error.response.data) {
-          toast.error(error.response.data); // Display the entire response data in the toast
-        } else {
-          toast.error("An error occurred. Please try again later."); // Generic error message
-        }
+      .catch(({ response }) => {
+        toast.error(response?.data?.error);
       });
-    // .catch(({ response }) => {
-    //   toast.error(response.data.error);
-    // });
   };
 
   const handleSubmit = (e) => {
@@ -57,7 +43,6 @@ export default function UserAuthForm({ type }) {
     for (let [key, value] of form.entries()) {
       formData[key] = value;
     }
-    console.log("form data", formData);
 
     let { fullname, email, password } = formData;
 
@@ -82,8 +67,26 @@ export default function UserAuthForm({ type }) {
     userAuthToServer(serverRoute, formData);
   };
 
-  return (
-    access_token ? <Navigate  to= "/" /> :
+  const handleGoogleAuth = (e) => {
+    e.preventDefault();
+
+    authWithGoogle()
+      .then((user) => {
+        let serverRoute = "/api/users/google-auth";
+
+        let formData = { access_token: user?.accessToken };
+
+        userAuthToServer(serverRoute, formData);
+      })
+      .catch((err) => {
+        toast.error("Unable to login through Google");
+        console.log("Error: ", err);
+      });
+  };
+
+  return access_token ? (
+    <Navigate to="/" />
+  ) : (
     <AnimationWrapper keyValue={type}>
       <section className="h-cover flex items-center justify-center">
         <Toaster />
@@ -135,7 +138,10 @@ export default function UserAuthForm({ type }) {
             <hr className="w-1/2 border-black" />
           </div>
 
-          <button className="btn-dark flex items-center justify-center gap-4 w-[90%] center">
+          <button
+            className="btn-dark flex items-center justify-center gap-4 w-[90%] center"
+            onClick={handleGoogleAuth}
+          >
             <img src={googleIcon} alt="Google Icon" className="w-5" />
             Continue with Google
           </button>
