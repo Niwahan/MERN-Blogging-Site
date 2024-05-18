@@ -1,9 +1,9 @@
 import express from "express";
-import { getUploadURL } from "../Controllers/blogController";
+import { createBlog, verifyJWT } from "../Controllers/blogController.js";
 
 const router = express.Router();
 
-router.route("/get-upload-URL").get(getUploadURL);
+router.route("/create-blog").post(verifyJWT,createBlog);
 
 
 export default router;
