@@ -10,7 +10,7 @@ import { UserContext } from "../App";
 import { authWithGoogle } from "../common/firebase";
 
 export default function UserAuthForm({ type }) {
-  let { userAuth, setUserAuth } = useContext(UserContext);
+  const { userAuth, setUserAuth } = useContext(UserContext);
 
   // Ensure userAuth object is defined before accessing its properties
   const access_token = userAuth ? userAuth.access_token : null;

@@ -3,6 +3,9 @@ import AnimationWrapper from "../common/page-animation";
 import { Toaster, toast } from "react-hot-toast";
 import { EditorContext } from "../pages/editor.pages";
 import Tag from "./tags.component";
+import axios from "axios";
+import { UserContext } from "../App";
+import { useNavigate } from "react-router-dom";
 
 export default function PublishForm() {
   let characterLimit = 200;
@@ -10,10 +13,17 @@ export default function PublishForm() {
 
   let {
     blog,
-    blog: { banner, title, tags, description },
+    blog: { banner, title, content, tags, description },
     setEditorState,
     setBlog,
   } = useContext(EditorContext);
+
+  const {
+    userAuth: { access_token },
+  } = useContext(UserContext);
+
+  let navigate = useNavigate();
+
   const handleCloseEvent = () => {
     setEditorState("editor");
   };
@@ -53,6 +63,67 @@ export default function PublishForm() {
       }
       e.target.value = "";
     }
+  };
+
+  const publishBlog = (e) => {
+    if (e.target.className.includes("disable")) {
+      return;
+    }
+    if (!title.length) {
+      return toast.error("Write blog title before publishing.");
+    }
+    if (!description.length || description.length > characterLimit) {
+      return toast.error(
+        `Write a description about the blog within ${characterLimit} characters to publish.`
+      );
+    }
+    if (!tags.length) {
+      return toast.error("Enter at least 1 tag to help us rank your blog");
+    }
+
+    let loadingToast = toast.loading("Publishing...");
+
+    e.target.classList.add("disable");
+
+    let blogObj = {
+      title,
+      banner,
+      description,
+      content,
+      tags,
+      draft: false,
+    };
+
+    axios
+      .post(
+        import.meta.env.VITE_SERVER_DOMAIN + "/api/blogs/create-blog",
+        blogObj,
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      )
+      .then(() => {
+        e.target.classList.remove("disable");
+        toast.dismiss(loadingToast);
+        toast.success("Blog Published Successfully");
+        setTimeout(() => {
+          navigate("/");
+        }, 500);
+      })
+      .catch((error) => {
+        e.target.classList.remove("disable");
+        toast.dismiss(loadingToast);
+        // Log the error to the console for debugging
+        console.error(error);
+
+        // Use optional chaining to safely access error response
+        const errorMessage =
+          error.response?.data?.error ||
+          "An error occurred while publishing the blog";
+        toast.error(errorMessage);
+      });
   };
 
   return (
@@ -120,10 +191,12 @@ export default function PublishForm() {
               return <Tag tag={tag} tagIndex={index} key={tag} />;
             })}
           </div>
-            <p className="mt-1 mb-4 text-dark-grey text-right">
-              {tagLimit - tags.length} Tags Left
-            </p>
-            <button className="btn-dark px-8">Publish</button>
+          <p className="mt-1 mb-4 text-dark-grey text-right">
+            {tagLimit - tags.length} Tags Left
+          </p>
+          <button className="btn-dark px-8" onClick={publishBlog}>
+            Publish
+          </button>
         </div>
       </section>
     </AnimationWrapper>
