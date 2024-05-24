@@ -20,7 +20,7 @@ export default function Editor() {
   const [editorState, setEditorState] = useState("editor");
   const [textEditor, setTextEditor] = useState({ isReady: false });
 
-  let { userAuth: { access_token } = {} } = useContext(UserContext);
+  const { userAuth: { access_token } = {} } = useContext(UserContext);
 
   return (
     <EditorContext.Provider

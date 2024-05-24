@@ -27,33 +27,36 @@ export const createBlog = async (req, res) => {
 
   let { title, description, banner, tags, content, draft } = req.body;
 
-  if (!title.length) {
-    return res
-      .status(403)
-      .json({ error: "You must providea title to publish the blog" });
-  }
-  if (!description.length || description.length > 200) {
-    return res.status(403).json({
-      error:
-        "You must provide description to publish the blog, Maximum characters 200",
-    });
-  }
+  if (!draft) {
+    if (!description.length || description.length > 200) {
+      return res.status(403).json({
+        error:
+          "You must provide description to publish the blog, Maximum characters 200",
+      });
+    }
 
-  if (!banner.length) {
-    return res
-      .status(403)
-      .json({ error: "You must provide blog banner to publish the blog" });
-  }
-  if (!content.blocks.length) {
-    return res.status(403).json({
-      error: "You must provide some blog content to publish the blog",
-    });
-  }
+    if (!banner.length) {
+      return res
+        .status(403)
+        .json({ error: "You must provide blog banner to publish the blog" });
+    }
+    if (!content.blocks.length) {
+      return res.status(403).json({
+        error: "You must provide some blog content to publish the blog",
+      });
+    }
 
-  if (!tags.length || tags.length > 10) {
-    return res.status(403).json({
-      error: "You must provide some tags to publish the blog, Maximum of 10",
-    });
+    if (!tags.length || tags.length > 10) {
+      return res.status(403).json({
+        error: "You must provide some tags to publish the blog, Maximum of 10",
+      });
+    }
+
+    if (!title.length) {
+      return res
+        .status(403)
+        .json({ error: "You must providea title for the blog" });
+    }
   }
 
   tags = tags.map((tag) => tag.toLowerCase());
@@ -84,7 +87,7 @@ export const createBlog = async (req, res) => {
         { _id: authorId },
         {
           $inc: { "account_info.total_posts": incrementVal },
-          $push: { "blogs": blog._id },
+          $push: { blogs: blog._id },
         }
       )
         .then((user) => {
