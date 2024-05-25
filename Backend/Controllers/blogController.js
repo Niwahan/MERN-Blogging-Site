@@ -88,7 +88,7 @@ export const createBlog = async (req, res) => {
 
   let blog = new Blog({
     title,
-    des: description,
+    description,
     banner,
     content,
     tags,
