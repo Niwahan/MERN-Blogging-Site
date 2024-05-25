@@ -85,7 +85,6 @@ export default function BLogEditor() {
   };
 
   const handlePublishEvent = () => {
-    console.log(textEditor);
     if (!banner.length) {
       return toast.error("Upload a blog banner to publish it.");
     }
