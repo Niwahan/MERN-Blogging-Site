@@ -4,6 +4,25 @@ import { nanoid } from "nanoid";
 import Blog from "../Schema/Blog.js";
 import User from "../Schema/User.js";
 
+export const latestBlogs = (req, res) => {
+  let maxLimit = 5;
+
+  Blog.find({ draft: false })
+    .populate(
+      "author",
+      "personal_info.profile_img personal_info.username personal_info.fullname -_id"
+    )
+    .sort({ publishedAt: -1 })
+    .select("blog_id title description banner activity tags publishedAt -_id")
+    .limit(maxLimit)
+    .then((blogs) => {
+      return res.status(200).json({ blogs });
+    })
+    .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+};
+
 export const verifyJWT = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -69,7 +88,7 @@ export const createBlog = async (req, res) => {
 
   let blog = new Blog({
     title,
-    des: description,
+    description,
     banner,
     content,
     tags,
