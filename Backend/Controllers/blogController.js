@@ -5,6 +5,8 @@ import Blog from "../Schema/Blog.js";
 import User from "../Schema/User.js";
 
 export const latestBlogs = (req, res) => {
+  let { page } = req.body;
+
   let maxLimit = 5;
 
   Blog.find({ draft: false })
@@ -14,11 +16,23 @@ export const latestBlogs = (req, res) => {
     )
     .sort({ publishedAt: -1 })
     .select("blog_id title description banner activity tags publishedAt -_id")
+    .skip((page - 1) * maxLimit)
     .limit(maxLimit)
     .then((blogs) => {
       return res.status(200).json({ blogs });
     })
     .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+};
+
+export const allLatestBlogs = (req, res) => {
+  Blog.countDocuments({ draft: false })
+    .then((count) => {
+      return res.status(200).json({ totalDocs: count });
+    })
+    .catch((err) => {
+      console.log(err.message);
       return res.status(500).json({ error: err.message });
     });
 };
@@ -45,7 +59,7 @@ export const trendingBlogs = (req, res) => {
 };
 
 export const searchBlogs = (req, res) => {
-  let { tag } = req.body;
+  let { tag, page } = req.body;
   let findQuery = { tags: tag, draft: false };
   let maxLimit = 5;
 
@@ -56,11 +70,26 @@ export const searchBlogs = (req, res) => {
     )
     .sort({ publishedAt: -1 })
     .select("blog_id title description banner activity tags publishedAt -_id")
+    .skip((page - 1) * maxLimit)
     .limit(maxLimit)
     .then((blogs) => {
       return res.status(200).json({ blogs });
     })
     .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+};
+
+export const searchBlogsCount = (req, res) => {
+  let { tag } = req.body;
+  let findQuery = { tags: tag, draft: false };
+
+  Blog.countDocuments(findQuery)
+    .then((count) => {
+      return res.status(200).json({ totalDocs: count });
+    })
+    .catch((err) => {
+      console.log(err.message);
       return res.status(500).json({ error: err.message });
     });
 };
