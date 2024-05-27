@@ -59,8 +59,15 @@ export const trendingBlogs = (req, res) => {
 };
 
 export const searchBlogs = (req, res) => {
-  let { tag, page } = req.body;
-  let findQuery = { tags: tag, draft: false };
+  let { tag, query, page } = req.body;
+  let findQuery;
+
+  if (tag) {
+    findQuery = { tags: tag, draft: false };
+  } else if (query) {
+    findQuery = { draft: false, title: new RegExp(query, "i") };
+  }
+
   let maxLimit = 5;
 
   Blog.find(findQuery)
@@ -81,15 +88,36 @@ export const searchBlogs = (req, res) => {
 };
 
 export const searchBlogsCount = (req, res) => {
-  let { tag } = req.body;
-  let findQuery = { tags: tag, draft: false };
+  let { tag, query } = req.body;
+  let findQuery;
 
+  if (tag) {
+    findQuery = { tags: tag, draft: false };
+  } else if (query) {
+    findQuery = { draft: false, title: new RegExp(query, "i") };
+  }
   Blog.countDocuments(findQuery)
     .then((count) => {
       return res.status(200).json({ totalDocs: count });
     })
     .catch((err) => {
       console.log(err.message);
+      return res.status(500).json({ error: err.message });
+    });
+};
+
+export const searchUsers = (req, res) => {
+  let { query } = req.body;
+
+  User.find({ "personal_info.username": new RegExp(query, "i") })
+    .limit(50)
+    .select(
+      "personal_info.fullname personal_info.username personal_info.profile_img -_id"
+    )
+    .then((users) => {
+      return res.status(200).json({ users });
+    })
+    .catch((err) => {
       return res.status(500).json({ error: err.message });
     });
 };
