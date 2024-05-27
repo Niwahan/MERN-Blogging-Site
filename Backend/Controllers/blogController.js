@@ -59,13 +59,15 @@ export const trendingBlogs = (req, res) => {
 };
 
 export const searchBlogs = (req, res) => {
-  let { tag, query, page } = req.body;
+  let { tag, query, author, page } = req.body;
   let findQuery;
 
   if (tag) {
     findQuery = { tags: tag, draft: false };
   } else if (query) {
     findQuery = { draft: false, title: new RegExp(query, "i") };
+  } else if (author) {
+    findQuery = { draft: false, author }
   }
 
   let maxLimit = 5;
@@ -88,13 +90,15 @@ export const searchBlogs = (req, res) => {
 };
 
 export const searchBlogsCount = (req, res) => {
-  let { tag, query } = req.body;
+  let { tag, query, author } = req.body;
   let findQuery;
 
   if (tag) {
     findQuery = { tags: tag, draft: false };
   } else if (query) {
     findQuery = { draft: false, title: new RegExp(query, "i") };
+  }  else if (author) {
+    findQuery = { draft: false, author }
   }
   Blog.countDocuments(findQuery)
     .then((count) => {
@@ -118,6 +122,20 @@ export const searchUsers = (req, res) => {
       return res.status(200).json({ users });
     })
     .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+};
+
+export const getProfile = (req, res) => {
+  let { username } = req.body;
+
+  User.findOne({ "personal_info.username": username })
+    .select("-personal_info.password -google_auth -updatedAt -blogs")
+    .then((user) => {
+      return res.status(200).json(user);
+    })
+    .catch((err) => {
+      console.log(err);
       return res.status(500).json({ error: err.message });
     });
 };

@@ -1,21 +1,19 @@
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBIs7bl7LaVq6YCh4S5s31dUOefuKDaGrk",
-  authDomain: "mern-blogging-site-6ed02.firebaseapp.com",
-  projectId: "mern-blogging-site-6ed02",
-  storageBucket: "mern-blogging-site-6ed02.appspot.com",
-  messagingSenderId: "770309190161",
-  appId: "1:770309190161:web:b92b7ff65bbdcdca4f77b0",
-  measurementId: "G-S1GS9N1PY0",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 
 // Storage
 export const storage = getStorage(app);
