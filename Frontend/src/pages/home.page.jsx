@@ -7,11 +7,43 @@ import BlogPostCard from "../components/blog-post.component";
 import MinimalBlogPost from "../components/nobanner-blog-post.component";
 import { activeTabRef } from "../components/inpage-navigation.component";
 import NoDataMessage from "../components/nodata.component";
+import { filterPaginationData } from "../common/filter-pagination-data";
+import LoadMoreDataBtn from "../components/load-more.component";
 
 const HomePage = () => {
   let [blogs, setBlogs] = useState(null);
   let [trendingBlogs, setTrendingBlogs] = useState(null);
   let [pageState, setPageState] = useState("home");
+
+  const fetchLatestBlogs = ({ page = 1 }) => {
+    axios
+      .post(import.meta.env.VITE_SERVER_DOMAIN + "/api/blogs/latest-blogs", {
+        page,
+      })
+      .then(async ({ data }) => {
+        let formatData = await filterPaginationData({
+          state: blogs,
+          data: data.blogs,
+          page,
+          countRoute: "/api/blogs/all-latest-blogs-count",
+        });
+        setBlogs(formatData);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const fetchTrendingBlogs = () => {
+    axios
+      .get(import.meta.env.VITE_SERVER_DOMAIN + "/api/blogs/trending-blogs")
+      .then(({ data }) => {
+        setTrendingBlogs(data.blogs);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   let categories = [
     "programming",
@@ -36,35 +68,21 @@ const HomePage = () => {
     setPageState(category);
   };
 
-  const fetchLatestBlogs = () => {
-    axios
-      .get(import.meta.env.VITE_SERVER_DOMAIN + "/api/blogs/latest-blogs")
-      .then(({ data }) => {
-        setBlogs(data.blogs);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const fetchBlogsByCategory = () => {
+  const fetchBlogsByCategory = ({ page = 1 }) => {
     axios
       .post(import.meta.env.VITE_SERVER_DOMAIN + "/api/blogs/search-blogs", {
         tag: pageState,
+        page,
       })
-      .then(({ data }) => {
-        setBlogs(data.blogs);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const fetchTrendingBlogs = () => {
-    axios
-      .get(import.meta.env.VITE_SERVER_DOMAIN + "/api/blogs/trending-blogs")
-      .then(({ data }) => {
-        setTrendingBlogs(data.blogs);
+      .then(async ({ data }) => {
+        let formatData = await filterPaginationData({
+          state: blogs,
+          data: data.blogs,
+          page,
+          countRoute: "/api/blogs/search-blogs-count",
+          data_to_send: { tag: pageState },
+        });
+        setBlogs(formatData);
       })
       .catch((err) => {
         console.log(err);
@@ -75,9 +93,9 @@ const HomePage = () => {
     activeTabRef.current.click();
 
     if (pageState == "home") {
-      fetchLatestBlogs();
+      fetchLatestBlogs({ page: 1 });
     } else {
-      fetchBlogsByCategory();
+      fetchBlogsByCategory({ page: 1 });
     }
     if (!trendingBlogs) {
       fetchTrendingBlogs();
@@ -96,8 +114,8 @@ const HomePage = () => {
             <>
               {blogs == null ? (
                 <Loader />
-              ) : blogs.length ? (
-                blogs.map((blog, i) => {
+              ) : blogs.results.length ? (
+                blogs.results.map((blog, i) => {
                   return (
                     <AnimationWrapper
                       key={i}
@@ -113,6 +131,12 @@ const HomePage = () => {
               ) : (
                 <NoDataMessage message="No Blogs Published" />
               )}
+              <LoadMoreDataBtn
+                state={blogs}
+                fetchDataFunc={
+                  pageState == "home" ? fetchLatestBlogs : fetchBlogsByCategory
+                }
+              />
             </>
             <>
               {trendingBlogs == null ? (
