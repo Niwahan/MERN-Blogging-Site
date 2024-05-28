@@ -2,6 +2,7 @@ import express from "express";
 import {
   allLatestBlogs,
   createBlog,
+  getBlog,
   getProfile,
   latestBlogs,
   searchBlogs,
@@ -21,5 +22,6 @@ router.route("/search-blogs-count").post(searchBlogsCount);
 router.route("/search-users").post(searchUsers);
 router.route("/get-profile").post(getProfile);
 router.route("/create-blog").post(verifyJWT, createBlog);
+router.route("/get-blog").post(getBlog);
 
 export default router;

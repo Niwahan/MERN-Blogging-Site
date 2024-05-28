@@ -16,7 +16,7 @@ import { UserContext } from "../App";
 export default function BLogEditor() {
   const {
     blog,
-    blog: { title, banner, content, tags, description },
+    blog: { title, banner, content, tags, description } = {},
     setBlog,
     textEditor,
     setTextEditor,
@@ -28,6 +28,7 @@ export default function BLogEditor() {
   const { access_token } = userAuth;
 
   useEffect(() => {
+    console.log(userAuth)
     if (!textEditor.isReady) {
       setTextEditor(
         new EditorJS({
