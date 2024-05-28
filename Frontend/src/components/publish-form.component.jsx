@@ -13,13 +13,13 @@ export default function PublishForm() {
 
   let {
     blog,
-    blog: { banner, title, content, tags, description },
+    blog: { banner, title, content, tags, description } = {},
     setEditorState,
     setBlog,
   } = useContext(EditorContext);
 
   const {
-    userAuth: { access_token },
+    userAuth: { access_token } = {},
   } = useContext(UserContext);
 
   let navigate = useNavigate();
