@@ -40,7 +40,7 @@ const BlogInteraction = () => {
         <div className="flex gap-6 items-center">
           {username == author_username ? (
             <Link
-              to={`editor/${blog_id}`}
+              to={`/editor/${blog_id}`}
               className="underline hover:text-purple"
             >
               Edit

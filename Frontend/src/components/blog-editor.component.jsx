@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import logo from "../imgs/logo.png";
 import AnimationWrapper from "../common/page-animation";
 import defaultBanner from "../imgs/blog banner.png";
@@ -16,7 +16,7 @@ import { UserContext } from "../App";
 export default function BLogEditor() {
   const {
     blog,
-    blog: { title, banner, content, tags, description } = {},
+    blog: { title, banner, content, tags, description },
     setBlog,
     textEditor,
     setTextEditor,
@@ -27,13 +27,14 @@ export default function BLogEditor() {
   const { userAuth = {} } = useContext(UserContext);
   const { access_token } = userAuth;
 
+  let {blog_id} = useParams();
+
   useEffect(() => {
-    console.log(userAuth)
     if (!textEditor.isReady) {
       setTextEditor(
         new EditorJS({
           holderId: "textEditor",
-          data: content,
+          data: Array.isArray(content) ? content[0]: content,
           tools: tools,
           placeholder: "Let's write an awesome blog",
         })
@@ -135,7 +136,7 @@ export default function BLogEditor() {
         axios
           .post(
             import.meta.env.VITE_SERVER_DOMAIN + "/api/blogs/create-blog",
-            blogObj,
+            {...blogObj, id: blog_id},
             {
               headers: {
                 Authorization: `Bearer ${access_token}`,
