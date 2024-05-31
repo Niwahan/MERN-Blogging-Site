@@ -4,7 +4,9 @@ import {
   createBlog,
   getBlog,
   getProfile,
+  isLikedByUser,
   latestBlogs,
+  likeBlog,
   searchBlogs,
   searchBlogsCount,
   searchUsers,
@@ -23,5 +25,7 @@ router.route("/search-users").post(searchUsers);
 router.route("/get-profile").post(getProfile);
 router.route("/create-blog").post(verifyJWT, createBlog);
 router.route("/get-blog").post(getBlog);
+router.route("/like-blog").post(verifyJWT, likeBlog);
+router.route("/isliked-by-user").post(verifyJWT, isLikedByUser);
 
 export default router;
