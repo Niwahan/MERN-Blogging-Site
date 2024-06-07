@@ -448,7 +448,7 @@ export const getReplies = (req, res) => {
   Comment.findOne({ _id })
     .populate({
       path: "children",
-      option: {
+      options: {
         limit: maxLimit,
         skip: skip,
         sort: { commentedAt: -1 },
@@ -476,9 +476,8 @@ const deleteComments = (_id) => {
         Comment.findOneAndUpdate(
           { _id: comment.parent },
           { $pull: { children: _id } }
-            .then((data) => console.log("Comment Delete from Parent"))
-            .catch((err) => console.log(err.message))
-        );
+        ).then((data) => console.log("Comment Delete from Parent"))
+            .catch((err) => console.log(err.message));
       }
 
       Notification.findOneAndDelete({ comment: _id }).then((notification) =>
@@ -497,8 +496,8 @@ const deleteComments = (_id) => {
         }
       ).then((blog) => {
         if (comment.children.length) {
-          comment.children.map((replies) => {
-            deleteComments(replies);
+          comment.children.forEach((childId) => {
+            deleteComments(childId);
           });
         }
       });
