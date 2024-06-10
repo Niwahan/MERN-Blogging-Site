@@ -33,7 +33,7 @@ export default function NavBar() {
 
   return (
     <>
-      <nav className="navbar">
+      <nav className="navbar z-50">
         <Link to="/" className="flex-none w-10">
           <img src={Logo} alt="Logo" className="w-full" />
         </Link>
