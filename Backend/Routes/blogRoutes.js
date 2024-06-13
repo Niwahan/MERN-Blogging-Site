@@ -15,8 +15,8 @@ import {
   searchBlogsCount,
   searchUsers,
   trendingBlogs,
-  verifyJWT,
 } from "../Controllers/blogController.js";
+import { verifyJWT } from "../Services/userServices.js";
 
 const router = express.Router();
 
