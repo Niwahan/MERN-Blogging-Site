@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import {
   formatDatatoSend,
   generateUsername,
-} from "../Services/UserServices.js";
+} from "../Services/userServices.js";
 import User from "../Schema/User.js";
 import admin from "firebase-admin";
 import serviceAccount from "../firebaseConfig.json" assert { type: "json" };
@@ -81,7 +81,10 @@ export const signIn = async (req, res) => {
           }
         });
       } else {
-        return res.status(403).json({error: "Account was created using Google. Try logging in with Google."})
+        return res.status(403).json({
+          error:
+            "Account was created using Google. Try logging in with Google.",
+        });
       }
     })
     .catch((err) => {
@@ -144,5 +147,67 @@ export const googleAuth = async (req, res) => {
         error:
           "Failed to authenticate with Google. Try with another Google account.",
       });
+    });
+};
+
+export const changePassword = (req, res) => {
+  let { currentPassword, newPassword } = req.body;
+
+  if (
+    !passwordRegex.test(currentPassword) ||
+    !passwordRegex.test(newPassword)
+  ) {
+    return res.status(403).json({
+      error: `Password should contain the following : \n1. One uppercase letter \n2. One lowercase letter \n3. One number \n4. Should be between 6 to 20 characters`,
+    });
+  }
+
+  User.findOne({ _id: req.user })
+    .then((user) => {
+      if (user.google_auth) {
+        return res.status(403).json({
+          error:
+            "You can't change account's password as you have logged in using google",
+        });
+      }
+
+      bcrypt.compare(
+        currentPassword,
+        user.personal_info.password,
+        (err, result) => {
+          if (err) {
+            return res.status(500).json({
+              error:
+                "Some error occured while changing the password. Please try again later",
+            });
+          }
+
+          if (!result) {
+            return res
+              .status(403)
+              .json({ error: "Incorrect Current Password" });
+          }
+
+          bcrypt.hash(newPassword, 10, (err, hashed_password) => {
+            User.findOneAndUpdate(
+              { _id: req.user },
+              { "personal_info.password": hashed_password }
+            )
+              .then((u) => {
+                return res.status(200).json({ status: "Password Changed" });
+              })
+              .catch((err) => {
+                return res.status(500).json({
+                  error:
+                    "Some error occured while saving new password. Please try again later",
+                });
+              });
+          });
+        }
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ error: "User not found" });
     });
 };
