@@ -4,6 +4,8 @@ import {
   googleAuth,
   signIn,
   signUp,
+  updateProfile,
+  updateProfileImage,
 } from "../Controllers/userController.js";
 import { verifyJWT } from "../Services/userServices.js";
 
@@ -13,5 +15,7 @@ router.route("/signup").post(signUp);
 router.route("/signin").post(signIn);
 router.route("/google-auth").post(googleAuth);
 router.route("/change-password").post(verifyJWT, changePassword);
+router.route("/update-profile-image").post(verifyJWT, updateProfileImage);
+router.route("/update-profile").post(verifyJWT, updateProfile);
 
 export default router;
