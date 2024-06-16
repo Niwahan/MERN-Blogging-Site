@@ -1,17 +1,41 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Logo from "../imgs/logo.png";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { UserContext } from "../App";
 import UserNavigationPanel from "./user-navigation.component";
+import axios from "axios";
 
 export default function NavBar() {
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
   const [userNavPanel, setUserNavPanel] = useState(false);
-  
+
   const navigate = useNavigate();
 
-  const { userAuth = {} } = useContext(UserContext);
-  const { access_token, profile_img } = userAuth;
+  const {
+    userAuth,
+    userAuth: { access_token, profile_img, new_notification_available } = {},
+    setUserAuth,
+  } = useContext(UserContext);
+
+  useEffect(() => {
+    if (access_token) {
+      axios
+        .get(
+          import.meta.env.VITE_SERVER_DOMAIN + "/api/users/new-notification",
+          {
+            headers: {
+              Authorization: `Bearer ${access_token}`,
+            },
+          }
+        )
+        .then(({ data }) => {
+          setUserAuth({ ...userAuth, ...data });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [access_token]);
 
   const handleUserNavPanel = () => {
     setUserNavPanel((currentVal) => !currentVal);
@@ -24,12 +48,12 @@ export default function NavBar() {
   };
 
   const handleSearch = (e) => {
-    let  query = e.target.value;
+    let query = e.target.value;
 
     if (e.keyCode == 13 && query.length) {
-      navigate(`/search/${query}`)
+      navigate(`/search/${query}`);
     }
-  }
+  };
 
   return (
     <>
@@ -70,6 +94,11 @@ export default function NavBar() {
               <Link to="/dashboard/notification">
                 <button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10">
                   <i className="fi fi-rr-bell text-2xl block mt1"></i>
+                  {new_notification_available ? (
+                    <span className="bg-red w-3 h-3 rounded-full absolute z-10 top-2 right-2"></span>
+                  ) : (
+                    ""
+                  )}
                 </button>
               </Link>
 

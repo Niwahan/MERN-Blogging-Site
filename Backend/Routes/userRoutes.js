@@ -2,6 +2,7 @@ import express from "express";
 import {
   changePassword,
   googleAuth,
+  newNotification,
   signIn,
   signUp,
   updateProfile,
@@ -17,5 +18,6 @@ router.route("/google-auth").post(googleAuth);
 router.route("/change-password").post(verifyJWT, changePassword);
 router.route("/update-profile-image").post(verifyJWT, updateProfileImage);
 router.route("/update-profile").post(verifyJWT, updateProfile);
+router.route("/new-notification").get(verifyJWT, newNotification);
 
 export default router;
