@@ -5,6 +5,7 @@ import {
   generateUsername,
 } from "../Services/userServices.js";
 import User from "../Schema/User.js";
+import Notification from "../Schema/Notification.js";
 import admin from "firebase-admin";
 import serviceAccount from "../firebaseConfig.json" assert { type: "json" };
 import { getAuth } from "firebase-admin/auth";
@@ -251,20 +252,16 @@ export const updateProfile = (req, res) => {
           !hostname.includes(`${socialLinksArr[i]}.com`) &&
           socialLinksArr[i] != "website"
         ) {
-          return res
-            .status(403)
-            .json({
-              error: `${socialLinksArr[i]} link is invalid. Please enter the full URL address`,
-            });
+          return res.status(403).json({
+            error: `${socialLinksArr[i]} link is invalid. Please enter the full URL address`,
+          });
         }
       }
     }
   } catch (err) {
-    return res
-      .status(500)
-      .json({
-        error: "You must provide full social links with http(s) included",
-      });
+    return res.status(500).json({
+      error: "You must provide full social links with http(s) included",
+    });
   }
 
   let updateObj = {
@@ -283,6 +280,27 @@ export const updateProfile = (req, res) => {
       if (err.code == 11000) {
         return res.status(409).json({ error: "Username is already taken" });
       }
+      return res.status(500).json({ error: err.message });
+    });
+};
+
+export const newNotification = (req, res) => {
+  let user_id = req.user;
+
+  Notification.exists({
+    notification_for: user_id,
+    seen: false,
+    user: { $ne: user_id },
+  })
+    .then((result) => {
+      if (result) {
+        return res.status(200).json({ new_notification_available: true });
+      } else {
+        return res.status(200).json({ new_notification_available: false });
+      }
+    })
+    .catch((err) => {
+      console.log(err.message);
       return res.status(500).json({ error: err.message });
     });
 };
