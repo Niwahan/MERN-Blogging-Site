@@ -332,7 +332,7 @@ export const isLikedByUser = (req, res) => {
 
 export const addComment = (req, res) => {
   let user_id = req.user;
-  let { _id, comment, blog_author, replying_to } = req.body;
+  let { _id, comment, blog_author, replying_to, notification_id } = req.body;
 
   if (!comment.length) {
     return res.status(403).json({ error: "Write something to comment" });
@@ -384,6 +384,12 @@ export const addComment = (req, res) => {
       ).then((replyingToComment) => {
         notificationObj.notification_for = replyingToComment.commented_by;
       });
+      if (notification_id) {
+        Notification.findOneAndUpdate(
+          { _id: notification_id },
+          { reply: commentFile._id }
+        ).then((notification) => console.log("Notification Updated"));
+      }
     }
 
     new Notification(notificationObj)
@@ -458,16 +464,18 @@ const deleteComments = (_id) => {
         Comment.findOneAndUpdate(
           { _id: comment.parent },
           { $pull: { children: _id } }
-        ).then((data) => console.log("Comment Delete from Parent"))
-            .catch((err) => console.log(err.message));
+        )
+          .then((data) => console.log("Comment Delete from Parent"))
+          .catch((err) => console.log(err.message));
       }
 
       Notification.findOneAndDelete({ comment: _id }).then((notification) =>
         console.log("Comment Notification Deleted")
       );
-      Notification.findOneAndDelete({ reply: _id }).then((notification) =>
-        console.log("Reply Notification Deleted")
-      );
+      Notification.findOneAndUpdate(
+        { reply: _id },
+        { $unset: { reply: 1 } }
+      ).then((notification) => console.log("Reply Notification Deleted"));
 
       Blog.findOneAndUpdate(
         { _id: comment.blog_id },
