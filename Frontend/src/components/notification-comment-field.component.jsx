@@ -19,7 +19,7 @@ const NotificationCommentField = ({
   let {
     notifications,
     notifications: { results },
-    setNotification,
+    setNotifications,
   } = notificationData;
 
   const handleAction = () => {
@@ -32,7 +32,7 @@ const NotificationCommentField = ({
         import.meta.env.VITE_SERVER_DOMAIN + "/api/blogs/add-comment",
         {
           _id,
-          blog_author,
+          blog_author: user_id,
           comment,
           replying_to: replyingTo,
           notification_id,
@@ -43,7 +43,7 @@ const NotificationCommentField = ({
         setReplying(false);
 
         results[index].reply = { comment, _id: data._id };
-        setNotification({ ...notifications, results });
+        setNotifications({ ...notifications, results });
       })
       .catch((err) => {
         console.log(err);
