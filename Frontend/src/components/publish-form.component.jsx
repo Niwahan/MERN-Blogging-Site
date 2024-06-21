@@ -11,7 +11,7 @@ export default function PublishForm() {
   let characterLimit = 200;
   let tagLimit = 10;
 
-  let {blog_id} = useParams();
+  let { blog_id } = useParams();
 
   let {
     blog,
@@ -20,9 +20,7 @@ export default function PublishForm() {
     setBlog,
   } = useContext(EditorContext);
 
-  const {
-    userAuth: { access_token } = {},
-  } = useContext(UserContext);
+  const { userAuth: { access_token } = {} } = useContext(UserContext);
 
   let navigate = useNavigate();
 
@@ -99,7 +97,7 @@ export default function PublishForm() {
     axios
       .post(
         import.meta.env.VITE_SERVER_DOMAIN + "/api/blogs/create-blog",
-        {...blogObj, id: blog_id},
+        { ...blogObj, id: blog_id },
         {
           headers: {
             Authorization: `Bearer ${access_token}`,
@@ -111,7 +109,7 @@ export default function PublishForm() {
         toast.dismiss(loadingToast);
         toast.success("Blog Published Successfully");
         setTimeout(() => {
-          navigate("/");
+          navigate("/dashboard/blogs");
         }, 500);
       })
       .catch((error) => {

@@ -148,7 +148,7 @@ export default function BLogEditor() {
             toast.dismiss(loadingToast);
             toast.success("Blog Saved to Draft Successfully");
             setTimeout(() => {
-              navigate("/");
+              navigate("/dashboard/blogs?tab=draft");
             }, 500);
           })
           .catch((error) => {
