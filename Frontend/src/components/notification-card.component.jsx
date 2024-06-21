@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { getDay } from "../common/date";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import NotificationCommentField from "./notification-comment-field.component";
 import { UserContext } from "../App";
 import axios from "axios";
@@ -33,8 +33,8 @@ const NotificationCard = ({ data, index, notificationState }) => {
 
   let {
     notifications,
-    notifications: { results, totalDocs, deletedDocCount },
-    setNotificaitons,
+    notifications: { results, totalDocs },
+    setNotifications,
   } = notificationState;
 
   const handleReply = () => {
@@ -60,7 +60,7 @@ const NotificationCard = ({ data, index, notificationState }) => {
         }
 
         target.removeAttribute("disabled");
-        setNotificaitons({
+        setNotifications({
           ...notifications,
           results,
           totalDocs: totalDocs - 1,
@@ -123,7 +123,7 @@ const NotificationCard = ({ data, index, notificationState }) => {
         <p>{getDay(createdAt)}</p>
         {type != "like" ? (
           <>
-            {reply ? (
+            {!reply ? (
               <button
                 className="underline hover:text-black"
                 onClick={handleReply}

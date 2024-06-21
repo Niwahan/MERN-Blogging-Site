@@ -503,7 +503,7 @@ export const deleteComment = (req, res) => {
   let { _id } = req.body;
 
   Comment.findOne({ _id }).then((comment) => {
-    if (user_id == comment.commented_by || user_id == comment.blog_author) {
+    if (user_id == comment?.commented_by || user_id == comment?.blog_author) {
       deleteComments(_id);
 
       return res.status(200).json({ status: "Comment Deleted" });
