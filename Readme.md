@@ -36,3 +36,9 @@ The application is deployed using both Render and Netlify, leveraging the streng
 - **Backend**: Render
 
 For more details on deployment strategies and configurations, refer to the deployment sections in the respective platform documentation.
+
+## Acknowledgments
+
+This project was built following a tutorial by Modern Web on YouTube. The tutorial provided a comprehensive guide on building a full-stack MERN application, and it was instrumental in the development of this blogging platform.
+
+Special thanks to Modern Web for creating and sharing such valuable content.
