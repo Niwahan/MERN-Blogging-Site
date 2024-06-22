@@ -1,8 +1,10 @@
 import React, { useContext, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import logo from "../imgs/logo.png";
+import lightLogo from "../imgs/logo-light.png";
+import darkLogo from "../imgs/logo-dark.png";
 import AnimationWrapper from "../common/page-animation";
-import defaultBanner from "../imgs/blog banner.png";
+import lightBanner from "../imgs/blog banner light.png";
+import darkBanner from "../imgs/blog banner dark.png";
 import { storage } from "../common/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
@@ -11,7 +13,7 @@ import { EditorContext } from "../pages/editor.pages";
 import EditorJS from "@editorjs/editorjs";
 import { tools } from "./tools.component";
 import axios from "axios";
-import { UserContext } from "../App";
+import { ThemeContext, UserContext } from "../App";
 
 export default function BLogEditor() {
   const {
@@ -24,17 +26,17 @@ export default function BLogEditor() {
   } = useContext(EditorContext);
 
   const navigate = useNavigate();
-  const { userAuth = {} } = useContext(UserContext);
-  const { access_token } = userAuth;
+  const { userAuth: { access_token } = {} } = useContext(UserContext);
+  const { theme } = useContext(ThemeContext);
 
-  let {blog_id} = useParams();
+  let { blog_id } = useParams();
 
   useEffect(() => {
     if (!textEditor.isReady) {
       setTextEditor(
         new EditorJS({
           holderId: "textEditor",
-          data: Array.isArray(content) ? content[0]: content,
+          data: Array.isArray(content) ? content[0] : content,
           tools: tools,
           placeholder: "Let's write an awesome blog",
         })
@@ -136,7 +138,7 @@ export default function BLogEditor() {
         axios
           .post(
             import.meta.env.VITE_SERVER_DOMAIN + "/api/blogs/create-blog",
-            {...blogObj, id: blog_id},
+            { ...blogObj, id: blog_id },
             {
               headers: {
                 Authorization: `Bearer ${access_token}`,
@@ -171,7 +173,7 @@ export default function BLogEditor() {
     <>
       <nav className="navbar">
         <Link to="/" className="flex-none w-10 ">
-          <img src={logo} />
+          <img src={theme == "light" ? darkLogo : lightLogo} />
         </Link>
         <p className="max-md:hidden text-black line-clamp-1 w-full">
           {title.length ? title : "New Blog"}
@@ -191,7 +193,10 @@ export default function BLogEditor() {
           <div className="mx-auto max-w-[900px]">
             <div className="relative aspect-video bg-white border-4 border-grey hover:opacity-80%">
               <label htmlFor="uploadBanner">
-                <img src={banner || defaultBanner} className="z-20" />
+                <img
+                  src={banner ? banner : (theme == "light" ? lightBanner : darkBanner)}
+                  className="z-20"
+                />
                 <input
                   id="uploadBanner"
                   type="file"
@@ -204,7 +209,7 @@ export default function BLogEditor() {
             <textarea
               defaultValue={title}
               placeholder="Blog Title"
-              className="text-4xl font-medium w-full h-20 outline-none resize-none mt-10 leading-tight placeholder:opacity-40"
+              className="text-4xl font-medium w-full h-20 outline-none resize-none mt-10 leading-tight placeholder:opacity-40 bg-white"
               onKeyDown={handleTitleKeyDown}
               onChange={handleTitleChange}
             ></textarea>
