@@ -1,4 +1,4 @@
-# MERN Blogging Site Clone
+# MERN Blogging Site
 
 ## Introduction
 Welcome to the MERN Blogging Platform, a full-stack application designed to emulate a real-world blogging environment similar to Medium. This project is built using the MERN stack, integrating MongoDB, Express.js, React, and Node.js to create a comprehensive blogging platform.
