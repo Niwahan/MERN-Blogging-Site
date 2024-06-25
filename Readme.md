@@ -32,7 +32,7 @@ The MERN Medium Clone is designed to provide a rich blogging experience, allowin
 ## Deployment
 The application is deployed using both Render and Netlify, leveraging the strengths of both platforms to ensure high availability and continuous integration/deployment. The frontend is hosted on Netlify, providing fast content delivery and automatic HTTPS, while the backend services are deployed on Render, known for its simplicity in managing and scaling Node.js applications.
 
-- **Frontend**: [niwa-blogsite.netlify.app](https://niwa-blogsite.netlify.app/)
+- **Frontend**: Netlify [niwa-blogsite.netlify.app](https://niwa-blogsite.netlify.app/)
 - **Backend**: Render
 
 For more details on deployment strategies and configurations, refer to the deployment sections in the respective platform documentation.
