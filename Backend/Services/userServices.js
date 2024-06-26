@@ -5,7 +5,7 @@ import User from "../Schema/User.js";
 export const formatDatatoSend = (user) => {
   const access_token = jwt.sign(
     { id: user._id },
-    process.env.Secret_Access_Key
+    process.env.SECRET_ACCESS_KEY
   );
   return {
     access_token,

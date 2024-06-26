@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import "dotenv/config";
+dotnet.config();
 import cors from "cors";
 import userRoutes from "./Routes/userRoutes.js";
 import blogRoutes from "./Routes/blogRoutes.js";
