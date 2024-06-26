@@ -9,7 +9,9 @@ const server = express();
 const PORT = 3000;
 
 server.use(express.json());
-server.use(cors());
+server.use(cors({
+  origin: "https://niwa-blogsite.netlify.app"
+}));
 
 mongoose.connect(process.env.DB_Location, {
   autoIndex: true,
