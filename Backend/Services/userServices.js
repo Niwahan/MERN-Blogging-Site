@@ -37,6 +37,7 @@ export const verifyJWT = (req, res, next) => {
 
   jwt.verify(token, process.env.SECRET_ACCESS_KEY, (err, user) => {
     if (err) {
+      console.error("JWT Verification Error:", err);
       return res.status(403).json({ error: "Access Token is invalid" });
     }
 

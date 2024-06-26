@@ -9,9 +9,31 @@ const server = express();
 const PORT = 3000;
 
 server.use(express.json());
-server.use(cors({
-  origin: ["https://niwa-blogsite.netlify.app", "https://mern-blogging-site.onrender.com"]
-}));
+server.use(
+  cors({
+    origin: [
+      "https://niwa-blogsite.netlify.app",
+      "https://mern-blogging-site.onrender.com",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
+// Handling CORS preflight requests
+server.options(
+  "*",
+  cors({
+    origin: [
+      "https://niwa-blogsite.netlify.app",
+      "https://mern-blogging-site.onrender.com",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 
 mongoose.connect(process.env.DB_Location, {
   autoIndex: true,
