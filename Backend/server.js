@@ -10,7 +10,7 @@ const PORT = 3000;
 
 server.use(express.json());
 server.use(cors({
-  origin: "https://niwa-blogsite.netlify.app"
+  origin: ["https://niwa-blogsite.netlify.app", "https://mern-blogging-site.onrender.com"]
 }));
 
 mongoose.connect(process.env.DB_Location, {

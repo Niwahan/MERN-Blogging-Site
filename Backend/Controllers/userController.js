@@ -103,9 +103,9 @@ export const googleAuth = async (req, res) => {
     .then(async (decodedUser) => {
       let { email, name } = decodedUser;
 
-      let user = await User.findOne({ "personal-info.email": email })
+      let user = await User.findOne({ "personal_info.email": email })
         .select(
-          "personal-info.fullname personal-info.username personal-info.profile_img google_auth"
+          "personal_info.fullname personal_info.username personal_info.profile_img google_auth"
         )
         .then((u) => {
           return u || null;
